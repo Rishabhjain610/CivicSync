@@ -92,7 +92,7 @@ export default function ContactUsPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg text-[#64748B] dark:text-[#94A3B8] leading-relaxed"
           >
-            Whether you're a citizen wanting to pilot Project Polis in your neighborhood, or a municipality looking to partner, we're here to talk.
+            Whether you're a citizen wanting to pilot Civic Sync in your neighborhood, or a municipality looking to partner, we're here to talk.
           </motion.p>
         </div>
 
@@ -148,7 +148,7 @@ export default function ContactUsPage() {
                 <MapPin className="w-8 h-8 mb-4 opacity-80" />
                 <h4 className={`text-xl font-bold mb-2 ${outfit.className}`}>Live everywhere.</h4>
                 <p className="text-cyan-100 text-sm leading-relaxed">
-                  Project Polis is an unprojected SVG plane. It works in any locality, independent of existing complex GIS infrastructure.
+                  Civic Sync is an unprojected SVG plane. It works in any locality, independent of existing complex GIS infrastructure.
                 </p>
               </div>
             </div>
@@ -228,3 +228,4 @@ export default function ContactUsPage() {
     </main>
   );
 }
+

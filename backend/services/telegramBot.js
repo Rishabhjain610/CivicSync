@@ -64,7 +64,7 @@ function registerHandlers(botInstance) {
 
   botInstance.command(["start", "help"], (ctx) => {
     ctx.replyWithMarkdown(
-      `👋 Welcome to *Project Polis*!\n\n` +
+      `👋 Welcome to *Civic Sync*!\n\n` +
       `📋 *Commands:*\n` +
       `/report — Start filing a new civic issue\n` +
       `/issues — List open issues\n` +
@@ -198,3 +198,4 @@ export const startBot = async () => {
 };
 
 export default { startBot };
+

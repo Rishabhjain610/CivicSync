@@ -51,7 +51,7 @@ export default function AboutPage() {
             transition={{ duration: 0.5 }}
             className="text-sm font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400 mb-4"
           >
-            About Project Polis
+            About Civic Sync
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
@@ -70,7 +70,7 @@ export default function AboutPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg text-[#64748B] dark:text-[#94A3B8] leading-relaxed max-w-2xl"
           >
-            Project Polis is a civic-tech platform that makes local issues visible, trackable, and resolvable — through a beautifully unified map and Kanban interface.
+            Civic Sync is a civic-tech platform that makes local issues visible, trackable, and resolvable — through a beautifully unified map and Kanban interface.
           </motion.p>
         </div>
       </div>
@@ -95,7 +95,7 @@ export default function AboutPage() {
                   In most cities, when a pothole appears or a drain floods, the report disappears into a form. Citizens have no way of knowing if it was even read, let alone acted upon.
                 </p>
                 <p>
-                  Project Polis was built to fix that. Every issue gets a pin on a live map, a card on a Kanban board, and a public status — visible to the entire community.
+                  Civic Sync was built to fix that. Every issue gets a pin on a live map, a card on a Kanban board, and a public status — visible to the entire community.
                 </p>
                 <p>
                   We started as a small engineering experiment. Today we&apos;re a platform that turns civic frustration into structured, trackable accountability.
@@ -114,7 +114,7 @@ export default function AboutPage() {
                 <div style={{ height: '340px', position: 'relative' }}>
                   <Image
                     src="/images/map_ui.png"
-                    alt="Project Polis Map"
+                    alt="Civic Sync Map"
                     fill
                     className="object-cover"
                     sizes="(max-width: 800px) 100vw, 600px"
@@ -368,7 +368,7 @@ export default function AboutPage() {
             {[
               { name: 'Aaditya', role: 'Founder & Lead Engineer', desc: 'Full-stack engineer obsessed with reactive state architecture and civic UX.', initial: 'A', color: 'from-cyan-400 to-blue-600' },
               { name: 'Civic Dev', role: 'Frontend Architect', desc: 'Specialist in SVG canvas systems and Framer Motion interaction design.', initial: 'C', color: 'from-fuchsia-400 to-purple-600' },
-              { name: 'Open Source', role: 'Community Builder', desc: 'Connecting Project Polis with NGOs, municipalities, and civic communities.', initial: 'O', color: 'from-emerald-400 to-teal-600' },
+              { name: 'Open Source', role: 'Community Builder', desc: 'Connecting Civic Sync with NGOs, municipalities, and civic communities.', initial: 'O', color: 'from-emerald-400 to-teal-600' },
             ].map((m, i) => (
               <motion.div
                 key={i}
@@ -397,7 +397,7 @@ export default function AboutPage() {
           >
             <div>
               <h3 className={`text-xl font-black mb-1 ${outfit.className}`}>Want to contribute?</h3>
-              <p className="text-[#64748B] dark:text-[#94A3B8] text-sm">Project Polis is open to contributors, pilot partners, and civic organisations.</p>
+              <p className="text-[#64748B] dark:text-[#94A3B8] text-sm">Civic Sync is open to contributors, pilot partners, and civic organisations.</p>
             </div>
             <Link
               href="/ContactUs"
@@ -412,3 +412,4 @@ export default function AboutPage() {
     </main>
   );
 }
+

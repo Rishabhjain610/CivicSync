@@ -23,7 +23,7 @@ export const initTelegramBot = () => {
       bot.sendMessage(
         msg.chat.id,
         `👋 Welcome, *${name}*!\n\n` +
-        `I'm the *Project Polis* bot — your civic issue tracker.\n\n` +
+        `I'm the *Civic Sync* bot — your civic issue tracker.\n\n` +
         `📋 *Available Commands:*\n` +
         `/issues — List latest 5 open issues\n` +
         `/status <id> — Check an issue's status\n` +
@@ -37,7 +37,7 @@ export const initTelegramBot = () => {
     bot.onText(/\/help/, (msg) => {
       bot.sendMessage(
         msg.chat.id,
-        `🛠️ *Project Polis Bot Help*\n\n` +
+        `🛠️ *Civic Sync Bot Help*\n\n` +
         `/start — Welcome message\n` +
         `/issues — Show 5 latest unresolved issues\n` +
         `/status <id> — Get status of a specific issue\n` +
@@ -111,7 +111,7 @@ export const initTelegramBot = () => {
         const rate = total > 0 ? Math.round((resolved / total) * 100) : 0;
         bot.sendMessage(
           msg.chat.id,
-          `📊 *Project Polis — Stats*\n\n` +
+          `📊 *Civic Sync — Stats*\n\n` +
           `📋 Total Issues: *${total}*\n` +
           `🆕 New: *${total - resolved - inProgress}*\n` +
           `⚡ In Progress: *${inProgress}*\n` +
@@ -170,7 +170,7 @@ export const sendIssueCreatedTelegram = async (issue) => {
   }
   const loc = [issue.town, issue.city, issue.state].filter(Boolean).join(" › ") || issue.location;
   const text =
-    `🚨 *New Issue — Project Polis*\n\n` +
+    `🚨 *New Issue — Civic Sync*\n\n` +
     `📌 *${issue.title}*\n` +
     `🏷️ ${issue.category}  |  📊 ${issue.status}\n` +
     `📍 ${loc}\n` +
@@ -181,3 +181,4 @@ export const sendIssueCreatedTelegram = async (issue) => {
 
   return sendTelegramMessage(chatId, text);
 };
+

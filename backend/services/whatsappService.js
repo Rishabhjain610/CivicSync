@@ -54,7 +54,7 @@ export const sendWhatsAppMessage = async (phone, message, attempt = 1) => {
 export const sendIssueCreatedWhatsApp = async (issue, adminPhone) => {
   const location = [issue.town, issue.city, issue.state].filter(Boolean).join(" › ") || issue.location;
   const message =
-    `🚨 *New Issue Reported — Project Polis*\n\n` +
+    `🚨 *New Issue Reported — Civic Sync*\n\n` +
     `📌 *Title:* ${issue.title}\n` +
     `🏷️ *Category:* ${issue.category}\n` +
     `📍 *Location:* ${location}\n` +
@@ -64,3 +64,4 @@ export const sendIssueCreatedWhatsApp = async (issue, adminPhone) => {
 
   return sendWhatsAppMessage(adminPhone, message);
 };
+

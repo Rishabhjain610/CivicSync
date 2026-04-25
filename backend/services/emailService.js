@@ -52,7 +52,7 @@ const buildIssueEmailHTML = (issue) => {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>New Issue — Project Polis</title>
+  <title>New Issue — Civic Sync</title>
 </head>
 <body style="margin:0;padding:0;background:#F8FAFC;font-family:'Helvetica Neue',Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFC;padding:32px 16px;">
@@ -63,7 +63,7 @@ const buildIssueEmailHTML = (issue) => {
         <tr>
           <td style="background:linear-gradient(135deg,#1E3A5F,#2563EB);padding:28px 32px;">
             <h1 style="margin:0;color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:-0.5px;">
-              🗺️ Project Polis
+              🗺️ Civic Sync
             </h1>
             <p style="margin:6px 0 0;color:rgba(255,255,255,0.75);font-size:13px;">
               Civic Issue Management System — PS-03
@@ -151,7 +151,7 @@ const buildIssueEmailHTML = (issue) => {
         <tr>
           <td style="background:#0F172A;padding:16px 32px;text-align:center;">
             <p style="margin:0;font-size:11px;color:#64748B;">
-              Project Polis — PS-03 · Civic Issue Management
+              Civic Sync — PS-03 · Civic Issue Management
             </p>
           </td>
         </tr>
@@ -209,8 +209,9 @@ export const sendEmail = async (to, subject, html, pdfBuffer = null, pdfName = "
  * @param {Buffer|null} pdfBuffer - Optional PDF attachment
  */
 export const sendIssueCreatedEmail = async (issue, recipientEmail, pdfBuffer = null) => {
-  const subject = `🚨 New Issue: ${issue.title} — Project Polis`;
+  const subject = `🚨 New Issue: ${issue.title} — Civic Sync`;
   const html = buildIssueEmailHTML(issue);
   const pdfName = `issue-${issue._id}.pdf`;
   return sendEmail(recipientEmail, subject, html, pdfBuffer, pdfName);
 };
+

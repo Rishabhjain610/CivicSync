@@ -300,7 +300,7 @@ const LeafletMap = ({ compact = false }: { compact?: boolean }) => {
 
   return (
     <div
-      className="relative w-full h-full rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-2xl bg-white dark:bg-slate-900"
+      className="relative z-0 w-full h-full rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-2xl bg-white dark:bg-slate-900"
       style={{ height, minHeight }}
     >
       {/* Empty state / No results */}

@@ -90,7 +90,7 @@ const Footer = () => {
         {/* Bottom bar */}
         <div className="border-t border-[#E2E8F0] dark:border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[#64748B] dark:text-[#94A3B8] text-sm font-medium">
-            © {new Date().getFullYear()} Project Polis. All rights reserved.
+            © {new Date().getFullYear()} Civic Sync. All rights reserved.
           </p>
           <div className="flex items-center gap-2 text-sm text-[#64748B] dark:text-[#94A3B8]">
             <Sparkles className="w-4 h-4 text-cyan-500" />

@@ -58,7 +58,7 @@ const MapPage = () => {
               Issue Management System
             </h1>
             <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">
-              PS-03 Project Polis — India › State › City › Town
+              PS-03 Civic Sync — India › State › City › Town
             </p>
           </div>
 
@@ -174,6 +174,9 @@ const MapPage = () => {
               transition={{ duration: 0.25 }}
               className="flex flex-col gap-8"
             >
+              {/* Kanban Board */}
+              <KanbanBoard />
+
               {/* Map header and Map */}
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
@@ -186,8 +189,6 @@ const MapPage = () => {
                   <LeafletMap compact />
                 </div>
               </div>
-
-              <KanbanBoard />
             </motion.div>
 
           ) : mapMode === 'svg' ? (
@@ -251,3 +252,4 @@ const MapPage = () => {
 };
 
 export default MapPage;
+

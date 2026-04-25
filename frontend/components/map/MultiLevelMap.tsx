@@ -466,31 +466,46 @@ const MultiLevelMap: React.FC = () => {
               aria-label="India map"
             >
               {/* India state paths */}
-              {(India as any).locations.map((loc: any) => (
-                <path
-                  key={loc.id}
-                  id={loc.id}
-                  d={loc.path}
-                  name={loc.name}
-                  onClick={(e) => {
-                    if (nav.level === 'india') handleStateClick(e, loc.name);
-                  }}
-                  onMouseMove={(e) => {
-                    if (!svgRef.current) return;
-                    const rect = svgRef.current.getBoundingClientRect();
-                    setTooltip({ text: loc.name, x: e.clientX - rect.left, y: e.clientY - rect.top - 10 });
-                    setHoveredState(loc.name);
-                  }}
-                  onMouseLeave={() => { setTooltip(null); setHoveredState(null); }}
-                  className={`transition-colors duration-200 stroke-white dark:stroke-slate-900 ${
-                    hoveredState === loc.name && nav.level === 'india'
-                      ? 'fill-blue-500 stroke-[1.5] cursor-pointer'
-                      : nav.level === 'state' && nav.selectedState === loc.name
-                        ? 'fill-blue-400 stroke-[1.5]'
-                        : 'fill-slate-200 dark:fill-slate-700 stroke-[0.5]'
-                  } ${nav.level === 'india' ? 'cursor-pointer' : 'cursor-default'}`}
-                />
-              ))}
+              {(India as any).locations.map((loc: any) => {
+                const stateIssueCount = filteredIssues.filter(i => i.state === loc.name).length;
+                
+                // Heatmap Choropleth Logic
+                let heatClass = 'fill-slate-100 dark:fill-slate-800'; // Default (0 issues)
+                if (stateIssueCount >= 10) heatClass = 'fill-red-600 dark:fill-red-500';
+                else if (stateIssueCount >= 5) heatClass = 'fill-orange-500 dark:fill-orange-400';
+                else if (stateIssueCount >= 3) heatClass = 'fill-amber-400 dark:fill-amber-300';
+                else if (stateIssueCount >= 1) heatClass = 'fill-blue-300 dark:fill-blue-400/50';
+
+                return (
+                  <path
+                    key={loc.id}
+                    id={loc.id}
+                    d={loc.path}
+                    name={loc.name}
+                    onClick={(e) => {
+                      if (nav.level === 'india') handleStateClick(e, loc.name);
+                    }}
+                    onMouseMove={(e) => {
+                      if (!svgRef.current) return;
+                      const rect = svgRef.current.getBoundingClientRect();
+                      setTooltip({ 
+                        text: `${loc.name} - ${stateIssueCount} issue${stateIssueCount !== 1 ? 's' : ''}`, 
+                        x: e.clientX - rect.left, 
+                        y: e.clientY - rect.top - 10 
+                      });
+                      setHoveredState(loc.name);
+                    }}
+                    onMouseLeave={() => { setTooltip(null); setHoveredState(null); }}
+                    className={`transition-colors duration-200 stroke-white dark:stroke-slate-900 ${
+                      hoveredState === loc.name && nav.level === 'india'
+                        ? 'fill-blue-500 stroke-[1.5] cursor-pointer'
+                        : nav.level === 'state' && nav.selectedState === loc.name
+                          ? 'fill-blue-400 stroke-[1.5]'
+                          : `${heatClass} stroke-[0.5]`
+                    } ${nav.level === 'india' ? 'cursor-pointer' : 'cursor-default'}`}
+                  />
+                );
+              })}
 
               {/* City markers when zoomed into a state */}
               {nav.level === 'state' && nav.selectedState && (

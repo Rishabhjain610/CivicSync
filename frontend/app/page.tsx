@@ -84,7 +84,14 @@ export default function HomePage() {
   return (
     <main className={`min-h-screen relative bg-[#F8FAFC] dark:bg-[#05050A] text-[#0F172A] dark:text-[#F8FAFC] transition-colors duration-500 pt-32 pb-20 ${spaceGrotesk.className}`}>
       
-      {/* Dynamic Background Glows */}
+      {/* Dynamic Background Glows and Texture */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-[0.4] dark:opacity-[0.15]" 
+        style={{ 
+          backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(148, 163, 184, 0.4) 1px, transparent 0)', 
+          backgroundSize: '24px 24px' 
+        }} 
+      />
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-cyan-400/20 dark:bg-cyan-600/20 blur-[150px]" />
         <div className="absolute top-[20%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-fuchsia-500/20 dark:bg-fuchsia-600/20 blur-[150px]" />
@@ -100,14 +107,14 @@ export default function HomePage() {
           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full text-white bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/30 mb-8"
         >
           <Sparkles className="w-4 h-4" />
-          <span>Project Polis • The Civic Standard</span>
+          <span>Civic Sync • The Civic Standard</span>
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-          className={`text-6xl md:text-8xl lg:text-[7.5rem] font-black tracking-tighter mb-8 leading-[1.05] ${outfit.className}`}
+          className={`text-5xl md:text-7xl lg:text-[6.5rem] font-black tracking-tighter mb-8 leading-[1.05] ${outfit.className}`}
         >
           Civic Action, <br />
           <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-fuchsia-500 bg-clip-text text-transparent drop-shadow-sm">
@@ -161,7 +168,7 @@ export default function HomePage() {
           <div className="w-full" style={{ height: '500px', position: 'relative' }}>
             <Image 
               src="/images/map_ui.png" 
-              alt="Project Polis Map Interface" 
+              alt="Civic Sync Map Interface" 
               fill 
               className="object-cover transition-transform duration-700 group-hover:scale-105"
               priority
@@ -263,7 +270,7 @@ export default function HomePage() {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 to-purple-600">Infinite Clarity.</span>
               </h2>
               <p className="text-[#64748B] dark:text-[#94A3B8] text-xl mb-8 leading-relaxed">
-                Project Polis operates on a unified reactive state atom. Toggle to the Kanban view, and the issue card is right there in the &apos;New&apos; column.
+                Civic Sync operates on a unified reactive state atom. Toggle to the Kanban view, and the issue card is right there in the &apos;New&apos; column.
               </p>
               <p className="text-[#64748B] dark:text-[#94A3B8] text-xl mb-10 leading-relaxed">
                 Drag it to &apos;In Progress&apos; and the map pin reflects the status change immediately. No data reconciliation, no asymmetry. Pure frontend mastery.
@@ -290,7 +297,7 @@ export default function HomePage() {
               <div className="relative aspect-[4/3] w-full bg-slate-100 dark:bg-[#020617]">
                 <Image 
                   src="/images/kanban_ui.png" 
-                  alt="Project Polis Kanban Interface" 
+                  alt="Civic Sync Kanban Interface" 
                   fill 
                   className="object-cover"
                 />

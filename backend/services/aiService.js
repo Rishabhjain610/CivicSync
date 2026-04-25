@@ -12,7 +12,7 @@ const GEMMA_MODEL = process.env.GEMMA_MODEL || "gemma4:31b-cloud";
  * @returns {Promise<string>} - The generated report text
  */
 export const generateAIReport = async (issue) => {
-  const prompt = `You are a professional civic infrastructure analyst for Project Polis. 
+  const prompt = `You are a professional civic infrastructure analyst for Civic Sync. 
 Generate a structured, formal incident analysis report for the following reported issue:
 
 - Title: ${issue.title}
@@ -64,3 +64,4 @@ Likely infrastructure wear, maintenance gaps, or unforeseen environmental factor
 Justified by reported category and description.`;
   }
 };
+
