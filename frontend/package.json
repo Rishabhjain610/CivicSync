@@ -1,0 +1,53 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^3.0.64",
+    "@ai-sdk/react": "^3.0.170",
+    "@reduxjs/toolkit": "^2.11.2",
+    "@tavily/core": "^0.7.2",
+    "ai": "^6.0.168",
+    "ai-sdk-ollama": "^3.8.3",
+    "axios": "^1.15.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "firebase": "^12.12.1",
+    "framer-motion": "^12.38.0",
+    "highlight.js": "^11.11.1",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
+    "lucide-react": "^0.563.0",
+    "next": "^16.1.6",
+    "next-themes": "^0.4.6",
+    "ollama-ai-provider": "^1.2.0",
+    "prismjs": "^1.30.0",
+    "razorpay": "^2.9.6",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.6.0",
+    "react-markdown": "^10.1.0",
+    "react-redux": "^9.2.0",
+    "react-toastify": "^11.1.0",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
