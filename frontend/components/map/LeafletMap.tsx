@@ -106,6 +106,59 @@ const FitBounds = ({ positions }: { positions: [number, number][] }) => {
   return null;
 };
 
+// ── Heatmap Layer ─────────────────────────────────────────────────────────────
+const HeatmapLayer = ({ issues }: { issues: Issue[] }) => {
+  const map = useMap();
+  const layerRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !map) return;
+    
+    // Import Leaflet and the heat plugin
+    const L = require('leaflet');
+    require('leaflet.heat');
+
+    // Clean up previous layer
+    if (layerRef.current) {
+      map.removeLayer(layerRef.current);
+      layerRef.current = null;
+    }
+
+    const points = issues
+      .filter(i => i.latlng?.lat && i.latlng?.lng)
+      .map(i => [i.latlng!.lat, i.latlng!.lng, 1]); // [lat, lng, intensity]
+
+    if (points.length > 0 && typeof (L as any).heatLayer === 'function') {
+      try {
+        const heat = (L as any).heatLayer(points, {
+          radius: 35,
+          blur: 20,
+          maxZoom: 14,
+          max: 1.0,
+          gradient: {
+            0.3: '#3B82F6', // Blue
+            0.5: '#10B981', // Green
+            0.8: '#F59E0B', // Orange
+            1.0: '#EF4444'  // Red
+          }
+        });
+        heat.addTo(map);
+        layerRef.current = heat;
+      } catch (err) {
+        console.error('Heatmap error:', err);
+      }
+    }
+
+    return () => {
+      if (layerRef.current && map) {
+        map.removeLayer(layerRef.current);
+      }
+    };
+  }, [map, issues]);
+
+  return null;
+};
+
 // ── MarkerCluster with flag icons + geocoding ─────────────────────────────────
 const MarkerCluster = ({ issues }: { issues: Issue[] }) => {
   const map = useMap();
@@ -242,12 +295,13 @@ const LeafletMap = ({ compact = false }: { compact?: boolean }) => {
     label: CATEGORY_LABEL[c],
   }));
 
-  const height = compact ? '420px' : '600px';
+  const height = compact ? '100%' : '600px';
+  const minHeight = compact ? '680px' : '600px'; // Matching the max-height of SVG map
 
   return (
     <div
-      className="relative w-full rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-2xl bg-white dark:bg-slate-900"
-      style={{ height }}
+      className="relative w-full h-full rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-2xl bg-white dark:bg-slate-900"
+      style={{ height, minHeight }}
     >
       {/* Empty state / No results */}
       {issuesWithAnyLoc.length === 0 && (
@@ -264,7 +318,14 @@ const LeafletMap = ({ compact = false }: { compact?: boolean }) => {
         </div>
       )}
 
-      <MapContainer center={[20.5937, 78.9629]} zoom={5} scrollWheelZoom zoomControl style={{ width: '100%', height: '100%' }}>
+      <MapContainer 
+        key={`map-container-${compact ? 'compact' : 'full'}`} 
+        center={[20.5937, 78.9629]} 
+        zoom={5} 
+        scrollWheelZoom 
+        zoomControl 
+        style={{ width: '100%', height: '100%' }}
+      >
         <LayersControl position="topright" collapsed>
           {tileLayers.map(layer => (
             <LayersControl.BaseLayer key={layer.key} name={layer.name} checked={!!layer.checked}>
@@ -275,7 +336,12 @@ const LeafletMap = ({ compact = false }: { compact?: boolean }) => {
 
         {hardPositions.length > 0 && !searchQuery && <FitBounds positions={hardPositions} />}
         <AutoZoom issues={filteredIssues} />
-        {issuesWithAnyLoc.length > 0 && <MarkerCluster issues={issuesWithAnyLoc} />}
+        {issuesWithAnyLoc.length > 0 && (
+          <>
+            <HeatmapLayer issues={issuesWithAnyLoc} />
+            <MarkerCluster issues={issuesWithAnyLoc} />
+          </>
+        )}
       </MapContainer>
 
       {/* Flag legend */}

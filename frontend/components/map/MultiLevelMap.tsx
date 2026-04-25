@@ -91,6 +91,11 @@ const TownPlane: React.FC<{
             <rect width="200" height="200" fill="url(#grid)" />
             <path d="M 200 0 L 0 0 0 200" fill="none" stroke="currentColor" strokeWidth="1" className="text-slate-300 dark:text-slate-600" />
           </pattern>
+          <radialGradient id="heat-grad">
+            <stop offset="0%" stopColor="#EF4444" stopOpacity="0.85" />
+            <stop offset="50%" stopColor="#F59E0B" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#FDE68A" stopOpacity="0" />
+          </radialGradient>
         </defs>
         <rect width="1000" height="700" fill="url(#gridBig)" />
 
@@ -99,6 +104,16 @@ const TownPlane: React.FC<{
           className="fill-slate-200 dark:fill-slate-700" fontSize="60" fontWeight="900" letterSpacing="4">
           {town.toUpperCase()}
         </text>
+
+        {/* Heatmap Layer */}
+        {pins.map((issue: any) => (
+          <circle 
+            key={`heat-${issue._id}`} 
+            cx={issue.pinX} cy={issue.pinY} 
+            r={180} 
+            fill="url(#heat-grad)" 
+          />
+        ))}
 
         {/* Existing pins */}
         {pins.map((issue: any) => (

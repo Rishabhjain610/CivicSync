@@ -154,7 +154,7 @@ async function processMessage(message) {
 // ── Menu ──────────────────────────────────────────────────────────────────────
 async function sendMenu(chatId, phone) {
   await reply(chatId, phone,
-    `👋 *Welcome to Project Polis!* 🏛️\n\n` +
+    `👋 *Welcome to Civic Sync!* 🏛️\n\n` +
     `What would you like to do today?\n\n` +
     `1️⃣ *Report Issue* (File a new report)\n` +
     `2️⃣ *Check Status* (Track by ID)\n` +
@@ -321,3 +321,4 @@ async function handleReportSubmit(chatId, phone, session) {
 }
 
 export default { handleIncomingWhatsAppMessage };
+

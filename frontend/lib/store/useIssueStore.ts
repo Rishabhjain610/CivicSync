@@ -38,11 +38,14 @@ interface IssueStore {
   updateStatus: (id: string, status: IssueStatus) => Promise<void>;
   upvoteIssue: (id: string) => Promise<void>;
   setSearchQuery: (query: string) => void;
+  dateFilter: 'all' | 'today' | 'week' | 'month';
+  setDateFilter: (filter: 'all' | 'today' | 'week' | 'month') => void;
 }
 
 export const useIssueStore = create<IssueStore>((set, get) => ({
   issues: [],
   searchQuery: '',
+  dateFilter: 'all',
   isLoading: false,
   error: null,
 
@@ -86,19 +89,40 @@ export const useIssueStore = create<IssueStore>((set, get) => ({
     }
   },
   setSearchQuery: (query) => set({ searchQuery: query }),
+  setDateFilter: (filter) => set({ dateFilter: filter }),
 }));
 
 export const useFilteredIssues = () => {
-  const { issues, searchQuery } = useIssueStore();
+  const { issues, searchQuery, dateFilter } = useIssueStore();
   return React.useMemo(() => {
-    if (!searchQuery) return issues;
-    const query = searchQuery.toLowerCase();
-    return issues.filter((i) => 
-      i.title?.toLowerCase().includes(query) ||
-      i.city?.toLowerCase().includes(query) ||
-      i.state?.toLowerCase().includes(query) ||
-      i.town?.toLowerCase().includes(query) ||
-      i.category?.toLowerCase().includes(query)
-    );
-  }, [issues, searchQuery]);
+    let filtered = issues;
+
+    // Date Filter
+    if (dateFilter !== 'all') {
+      const now = new Date();
+      filtered = filtered.filter(i => {
+        const d = new Date(i.createdAt || Date.now());
+        const diffMs = now.getTime() - d.getTime();
+        const diffDays = diffMs / (1000 * 60 * 60 * 24);
+        if (dateFilter === 'today') return diffDays <= 1;
+        if (dateFilter === 'week') return diffDays <= 7;
+        if (dateFilter === 'month') return diffDays <= 30;
+        return true;
+      });
+    }
+
+    // Search Filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((i) => 
+        i.title?.toLowerCase().includes(query) ||
+        i.city?.toLowerCase().includes(query) ||
+        i.state?.toLowerCase().includes(query) ||
+        i.town?.toLowerCase().includes(query) ||
+        i.category?.toLowerCase().includes(query)
+      );
+    }
+    
+    return filtered;
+  }, [issues, searchQuery, dateFilter]);
 };

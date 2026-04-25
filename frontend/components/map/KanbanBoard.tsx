@@ -14,7 +14,8 @@ import {
 } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { useIssueStore, useFilteredIssues, Issue, IssueStatus } from '@/lib/store/useIssueStore';
-import { ThumbsUp, MapPin, Clock, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
+import { ThumbsUp, MapPin, Clock, CheckCircle2, AlertCircle, TrendingUp, BadgeCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const COLUMNS: { id: IssueStatus; label: string; color: string; bg: string; icon: any }[] = [
   { id: 'New',         label: 'New',         color: '#F59E0B', bg: 'bg-amber-500',   icon: AlertCircle },
@@ -42,7 +43,15 @@ const IssueCard = ({ issue }: { issue: Issue }) => {
         <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border ${style.pill}`}>
           {issue.category}
         </span>
-        <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-1 ${style.dot}`} />
+        <div className="flex items-center gap-2">
+          {issue.status === 'Resolved' && (
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[9px] font-bold tracking-wider">
+              <BadgeCheck size={12} className="text-emerald-500" />
+              VERIFIED
+            </span>
+          )}
+          <div className={`w-2 h-2 rounded-full flex-shrink-0 ${style.dot}`} />
+        </div>
       </div>
 
       {/* Title */}
@@ -83,15 +92,20 @@ const IssueCard = ({ issue }: { issue: Issue }) => {
 const DraggableCard = ({ issue }: { issue: Issue }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: issue._id });
   return (
-    <div
+    <motion.div
       ref={setNodeRef}
-      style={{ transform: CSS.Translate.toString(transform), opacity: isDragging ? 0.25 : 1, touchAction: 'none' }}
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95, height: 0, overflow: 'hidden', marginBottom: 0 }}
+      transition={{ duration: 0.2 }}
+      style={{ transform: CSS.Translate.toString(transform), touchAction: 'none' }}
       {...attributes}
       {...listeners}
-      className={isDragging ? 'cursor-grabbing' : 'cursor-grab'}
+      className={isDragging ? 'cursor-grabbing opacity-40 shadow-xl' : 'cursor-grab'}
     >
       <IssueCard issue={issue} />
-    </div>
+    </motion.div>
   );
 };
 
@@ -149,9 +163,11 @@ const DroppableColumn = ({ col, issues, totalIssues }: {
           isOver ? 'bg-blue-50/40 dark:bg-blue-900/10' : 'bg-slate-50/50 dark:bg-slate-900/50'
         }`}
       >
-        {issues.map(issue => (
-          <DraggableCard key={issue._id} issue={issue} />
-        ))}
+        <AnimatePresence>
+          {issues.map(issue => (
+            <DraggableCard key={issue._id} issue={issue} />
+          ))}
+        </AnimatePresence>
 
         {/* Drop zone */}
         <div className={`mt-auto flex items-center justify-center rounded-2xl border-2 border-dashed min-h-[56px] transition-all ${

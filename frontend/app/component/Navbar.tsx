@@ -101,7 +101,7 @@ const Navbar = () => {
     <>
       <nav
         className={cn(
-          "fixed z-50 w-[95%] rounded-3xl left-1/2 border backdrop-blur-2xl transition-all duration-500 shadow-xl",
+          "fixed z-[9999] w-[95%] rounded-3xl left-1/2 border backdrop-blur-2xl transition-all duration-500 shadow-xl",
           "bg-white/80 dark:bg-[#0B0F19]/80",
           "border-[#E2E8F0] dark:border-white/10 hover:border-cyan-500/30 hover:shadow-cyan-500/10",
           "lg:w-[85%] lg:max-w-6xl lg:rounded-full",
