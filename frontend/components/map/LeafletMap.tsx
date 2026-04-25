@@ -54,7 +54,8 @@ async function geocode(query: string): Promise<{ lat: number; lng: number } | nu
 // ── Make flag icon from category ──────────────────────────────────────────────
 function makeCategoryFlagIcon(category: string) {
   if (typeof window === 'undefined') return null;
-  const L = require('leaflet');
+  const L = (window as any).L;
+  if (!L) return null;
   const src = CATEGORY_FLAGS[category] || CATEGORY_FLAGS['Safety'];
   return L.icon({
     iconUrl:    src,
@@ -106,19 +107,43 @@ const FitBounds = ({ positions }: { positions: [number, number][] }) => {
   return null;
 };
 
-// ── Heatmap Layer ─────────────────────────────────────────────────────────────
 const HeatmapLayer = ({ issues }: { issues: Issue[] }) => {
   const map = useMap();
   const layerRef = useRef<any>(null);
+  const [scriptLoaded, setScriptLoaded] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !map) return;
-    
-    // Import Leaflet and the heat plugin
-    const L = require('leaflet');
-    require('leaflet.heat');
+    if (typeof window === 'undefined') return;
+    const check = () => {
+      if ((window as any).L?.heatLayer) {
+        setScriptLoaded(true);
+        return true;
+      }
+      return false;
+    };
 
-    // Clean up previous layer
+    if (check()) return;
+
+    if (!document.getElementById('leaflet-heat-script')) {
+      const script = document.createElement('script');
+      script.id = 'leaflet-heat-script';
+      script.src = "https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js";
+      script.async = true;
+      script.onload = () => setScriptLoaded(true);
+      document.head.appendChild(script);
+    } else {
+      const interval = setInterval(() => {
+        if (check()) clearInterval(interval);
+      }, 100);
+      return () => clearInterval(interval);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!scriptLoaded || !map) return;
+    const L = (window as any).L;
+    if (!L || !L.heatLayer) return;
+
     if (layerRef.current) {
       map.removeLayer(layerRef.current);
       layerRef.current = null;
@@ -126,27 +151,20 @@ const HeatmapLayer = ({ issues }: { issues: Issue[] }) => {
 
     const points = issues
       .filter(i => i.latlng?.lat && i.latlng?.lng)
-      .map(i => [i.latlng!.lat, i.latlng!.lng, 1]); // [lat, lng, intensity]
+      .map(i => [i.latlng!.lat, i.latlng!.lng, 0.6]);
 
-    if (points.length > 0 && typeof (L as any).heatLayer === 'function') {
-      try {
-        const heat = (L as any).heatLayer(points, {
-          radius: 35,
-          blur: 20,
-          maxZoom: 14,
-          max: 1.0,
-          gradient: {
-            0.3: '#3B82F6', // Blue
-            0.5: '#10B981', // Green
-            0.8: '#F59E0B', // Orange
-            1.0: '#EF4444'  // Red
-          }
-        });
-        heat.addTo(map);
-        layerRef.current = heat;
-      } catch (err) {
-        console.error('Heatmap error:', err);
-      }
+    if (points.length > 0) {
+      // Safety check: ensure map is initialized and has panes
+      if (!(map as any)._panes) return;
+      
+      const heat = L.heatLayer(points, {
+        radius: 25,
+        blur: 15,
+        maxZoom: 17,
+        gradient: { 0.4: '#3B82F6', 0.65: '#10B981', 1: '#EF4444' }
+      });
+      heat.addTo(map);
+      layerRef.current = heat;
     }
 
     return () => {
@@ -154,7 +172,7 @@ const HeatmapLayer = ({ issues }: { issues: Issue[] }) => {
         map.removeLayer(layerRef.current);
       }
     };
-  }, [map, issues]);
+  }, [map, issues, scriptLoaded]);
 
   return null;
 };
@@ -163,9 +181,9 @@ const HeatmapLayer = ({ issues }: { issues: Issue[] }) => {
 const MarkerCluster = ({ issues }: { issues: Issue[] }) => {
   const map = useMap();
   const groupRef = useRef<any>(null);
+  const [clusterLoaded, setClusterLoaded] = useState(false);
   const [geoIssues, setGeoIssues] = useState<Issue[]>([]);
 
-  // Geocode issues that are missing latlng
   useEffect(() => {
     let cancelled = false;
     const resolve = async () => {
@@ -174,13 +192,10 @@ const MarkerCluster = ({ issues }: { issues: Issue[] }) => {
         if (issue.latlng?.lat && issue.latlng?.lng) {
           resolved.push(issue);
         } else {
-          // Build query from available location fields
-          const parts = [issue.town, issue.city, issue.state, issue.location].filter(Boolean);
+          const parts = [issue.town, issue.city, issue.state].filter(Boolean);
           const query = parts.join(', ');
           const coords = await geocode(query);
-          if (coords) {
-            resolved.push({ ...issue, latlng: coords });
-          }
+          if (coords) resolved.push({ ...issue, latlng: coords });
         }
       }
       if (!cancelled) setGeoIssues(resolved);
@@ -190,16 +205,46 @@ const MarkerCluster = ({ issues }: { issues: Issue[] }) => {
   }, [issues]);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || geoIssues.length === 0) return;
-    require('leaflet.markercluster');
-    const L = require('leaflet');
+    if (typeof window === 'undefined') return;
+    const check = () => {
+      if ((window as any).L?.markerClusterGroup) {
+        setClusterLoaded(true);
+        return true;
+      }
+      return false;
+    };
+
+    if (check()) return;
+
+    if (!document.getElementById('leaflet-cluster-script')) {
+      const script = document.createElement('script');
+      script.id = 'leaflet-cluster-script';
+      script.src = "https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js";
+      script.async = true;
+      script.onload = () => setClusterLoaded(true);
+      document.head.appendChild(script);
+    } else {
+      const interval = setInterval(() => {
+        if (check()) clearInterval(interval);
+      }, 100);
+      return () => clearInterval(interval);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!clusterLoaded || !map || geoIssues.length === 0) return;
+    const L = (window as any).L;
+    if (!L || !L.markerClusterGroup) return;
 
     if (groupRef.current) map.removeLayer(groupRef.current);
 
-    const cluster = (L as any).markerClusterGroup({
+    // Safety check: ensure map is initialized and has panes
+    if (!(map as any)._panes) return;
+
+    const cluster = L.markerClusterGroup({
       iconCreateFunction: makeClusterIcon,
-      maxClusterRadius: 60,
-      disableClusteringAtZoom: 14,
+      maxClusterRadius: 50,
+      disableClusteringAtZoom: 15,
       spiderfyOnMaxZoom: true,
     });
 
@@ -215,33 +260,33 @@ const MarkerCluster = ({ issues }: { issues: Issue[] }) => {
       const loc = [issue.town, issue.city, issue.state].filter(Boolean).join(' › ') || issue.location;
 
       marker.bindPopup(`
-        <div style="font-family:system-ui,sans-serif;min-width:210px;max-width:270px;">
-          <div style="display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid #E2E8F0;margin-bottom:8px;">
+        <div style="font-family:system-ui,sans-serif;min-width:220px;max-width:280px;">
+          <div style="display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid #F1F5F9;margin-bottom:10px;">
             <img src="${flagImg}" style="width:24px;height:32px;object-fit:contain;" />
             <div>
-              <div style="font-weight:800;font-size:13px;color:#0F172A;line-height:1.2;">${issue.title}</div>
-              <div style="font-size:10px;color:#64748B;margin-top:2px;">📍 ${loc}</div>
+              <div style="font-weight:900;font-size:14px;color:#0F172A;line-height:1.2;">${issue.title}</div>
+              <div style="font-size:10px;color:#64748B;margin-top:2px;font-weight:600;">📍 ${loc}</div>
             </div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
-            <div style="background:#F8FAFC;border-radius:8px;padding:6px;text-align:center;">
-              <div style="font-size:9px;color:#64748B;font-weight:600;text-transform:uppercase;">Category</div>
-              <div style="font-size:12px;font-weight:800;color:${color};margin-top:2px;">${emoji} ${issue.category}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+            <div style="background:#F8FAFC;border-radius:10px;padding:8px;text-align:center;border:1px solid #F1F5F9;">
+              <div style="font-size:8px;color:#94A3B8;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">Category</div>
+              <div style="font-size:12px;font-weight:900;color:${color};margin-top:2px;">${emoji} ${issue.category}</div>
             </div>
-            <div style="background:#F8FAFC;border-radius:8px;padding:6px;text-align:center;">
-              <div style="font-size:9px;color:#64748B;font-weight:600;text-transform:uppercase;">Status</div>
-              <div style="font-size:12px;font-weight:800;color:${statusColor};margin-top:2px;">${issue.status}</div>
+            <div style="background:#F8FAFC;border-radius:10px;padding:8px;text-align:center;border:1px solid #F1F5F9;">
+              <div style="font-size:8px;color:#94A3B8;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">Status</div>
+              <div style="font-size:12px;font-weight:900;color:${statusColor};margin-top:2px;">${issue.status}</div>
             </div>
           </div>
-          <div style="font-size:11px;color:#475569;line-height:1.5;margin-bottom:8px;">
-            ${issue.description ? issue.description.slice(0, 100) + (issue.description.length > 100 ? '…' : '') : 'No description.'}
+          <div style="font-size:11px;color:#475569;line-height:1.6;margin-bottom:10px;">
+            ${issue.description ? issue.description.slice(0, 120) + (issue.description.length > 120 ? '…' : '') : 'No description available.'}
           </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:6px;border-top:1px solid #E2E8F0;">
-            <span style="font-size:11px;font-weight:700;color:#3B82F6;">👍 ${issue.votes} votes</span>
-            <span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;background:${statusColor}22;color:${statusColor};">${issue.status}</span>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid #F1F5F9;">
+            <span style="font-size:11px;font-weight:900;color:#3B82F6;">👍 ${issue.votes} Votes</span>
+            <span style="font-size:9px;font-weight:900;padding:4px 10px;border-radius:999px;background:${statusColor}15;color:${statusColor};border:1px solid ${statusColor}30;">${issue.status.toUpperCase()}</span>
           </div>
         </div>
-      `, { maxWidth: 290, className: 'issue-popup' });
+      `, { maxWidth: 300, className: 'issue-popup' });
 
       cluster.addLayer(marker);
     });
@@ -250,7 +295,7 @@ const MarkerCluster = ({ issues }: { issues: Issue[] }) => {
     groupRef.current = cluster;
 
     return () => { if (groupRef.current) map.removeLayer(groupRef.current); };
-  }, [map, geoIssues]);
+  }, [map, geoIssues, clusterLoaded]);
 
   return null;
 };
@@ -319,7 +364,6 @@ const LeafletMap = ({ compact = false }: { compact?: boolean }) => {
       )}
 
       <MapContainer 
-        key={`map-container-${compact ? 'compact' : 'full'}`} 
         center={[20.5937, 78.9629]} 
         zoom={5} 
         scrollWheelZoom 
@@ -334,7 +378,7 @@ const LeafletMap = ({ compact = false }: { compact?: boolean }) => {
           ))}
         </LayersControl>
 
-        {hardPositions.length > 0 && !searchQuery && <FitBounds positions={hardPositions} />}
+        <FitBounds positions={hardPositions} />
         <AutoZoom issues={filteredIssues} />
         {issuesWithAnyLoc.length > 0 && (
           <>

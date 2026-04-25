@@ -4,7 +4,6 @@ import { getSession, setSession, deleteSession } from "../utils/session-manager.
 import { generateIssuePDF } from "./pdfService.js";
 import { sendIssueCreatedEmail } from "./emailService.js";
 import { generateAIReport } from "./aiService.js";
-import axios from "axios";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -14,8 +13,6 @@ let bot = null;
 let isBotRunning = false;
 
 const CATEGORIES = ["Infrastructure", "Sanitation", "Safety", "Greenery"];
-const GEMMA_URL = process.env.GEMMA_URL || "http://localhost:11434/api/generate";
-const GEMMA_MODEL = process.env.GEMMA_MODEL || "gemma4:31b-cloud";
 
 const getBot = () => {
   if (!bot) {
@@ -27,6 +24,16 @@ const getBot = () => {
 };
 
 // ==================== HELPERS ====================
+const stripMarkdown = (text) => {
+  if (!text) return "";
+  return text
+    .replace(/(\*\*|__)(.*?)\1/g, "$2") // Bold
+    .replace(/(\*|_)(.*?)\1/g, "$2")    // Italic
+    .replace(/#+\s?(.*)/g, "$1")         // Headers
+    .replace(/[\/*#`]/g, "")             // Residual symbols
+    .trim();
+};
+
 const buildProgressBar = (count, max = 100) => {
   const filled = Math.min(Math.round((count / max) * 10), 10);
   return "█".repeat(filled) + "░".repeat(10 - filled);
@@ -45,7 +52,6 @@ const categoryEmoji = {
   Greenery: "🌿",
 };
 
-
 const formatIssue = (issue, index) => {
   const loc = [issue.town, issue.city, issue.state].filter(Boolean).join(" › ") || issue.location;
   const emoji = categoryEmoji[issue.category] || "📌";
@@ -53,8 +59,7 @@ const formatIssue = (issue, index) => {
   return (
     `${index + 1}. ${flag} ${emoji} *${issue.title}*\n` +
     `   Status: ${issue.status}  |  🏷️ ${issue.category}\n` +
-    `   📍 ${loc}\n` +
-    `   🆔 \`${issue._id}\``
+    `   📍 ${loc}`
   );
 };
 
@@ -69,7 +74,6 @@ function registerHandlers(botInstance) {
       `/report — Start filing a new civic issue\n` +
       `/issues — List open issues\n` +
       `/stats — View system stats\n` +
-      `/status <id> — Check specific issue\n` +
       `/cancel — Stop current report`
     );
   });
@@ -167,10 +171,13 @@ function registerHandlers(botInstance) {
           const baseUrl = process.env.BACKEND_URL || "http://localhost:7979";
           const pdfUrl = `${baseUrl}/api/issues/${issue._id}/pdf`;
           
-          ctx.replyWithMarkdown(
-            `✅ *Issue Created!* #${issue._id.toString().slice(-6).toUpperCase()}\n\n` +
-            `🤖 *AI Analysis:* \n${aiReport.slice(0, 500)}...\n\n` +
-            `📄 *Download Report:* [Click here](${pdfUrl})`
+          // Clean the AI report for Telegram
+          const cleanAI = stripMarkdown(aiReport).slice(0, 400);
+          
+          await ctx.replyWithMarkdown(
+            `✅ *Issue Created!*\n\n` +
+            `🤖 *AI Analysis:*\n${cleanAI}...\n\n` +
+            `📄 *Full Report:* [Download PDF](${pdfUrl})`
           );
 
           if (process.env.ADMIN_EMAIL) {
