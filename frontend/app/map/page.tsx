@@ -3,8 +3,6 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutDashboard, Map as MapIcon, Globe, Layers, Search, Filter } from 'lucide-react';
-import { useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
 import MultiLevelMap from '@/components/map/MultiLevelMap';
 import KanbanBoard from '@/components/map/KanbanBoard';
 import MapMetrics from '@/components/map/MapMetrics';
@@ -31,21 +29,14 @@ type ViewMode = 'map' | 'board';
 type MapMode = 'svg' | 'leaflet' | 'hybrid';
 
 const MapPage = () => {
-  const router = useRouter();
-  const userData = useSelector((state: any) => state.user.userData);
   const [view, setView] = useState<ViewMode>('map');
   const [mapMode, setMapMode] = useState<MapMode>('svg');
   const { fetchIssues, searchQuery, setSearchQuery, dateFilter, setDateFilter } = useIssueStore();
 
   useEffect(() => {
-    if (!userData) {
-      router.push('/Login');
-    } else {
-      fetchIssues();
-    }
-  }, [userData, router, fetchIssues]);
-
-  if (!userData) return null;
+    // Silently try to fetch issues — page works even if backend is offline
+    fetchIssues().catch(() => {});
+  }, [fetchIssues]);
 
   return (
     <main className={`min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] pt-28 pb-20 px-4 md:px-8 ${spaceGrotesk.className}`}>
@@ -136,8 +127,8 @@ const MapPage = () => {
           {view === 'map' && (
             <div className="flex items-center bg-white dark:bg-slate-800 p-1 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
               {([
-                { mode: 'svg', icon: MapIcon, label: 'SVG' },
-                { mode: 'leaflet', icon: Globe, label: 'Satellite' },
+                { mode: 'svg', icon: MapIcon, label: 'SVG Map' },
+                { mode: 'leaflet', icon: Globe, label: 'Geographic' },
                 { mode: 'hybrid', icon: Layers, label: 'Hybrid' },
               ] as const).map(({ mode, icon: Icon, label }) => (
                 <button
